@@ -1,0 +1,14 @@
+{
+	"jobs": [
+		{
+			"jobTitel": "React Developer",
+			"description": "",
+			"location": "hamburg",
+			"details": {
+				"remote": true,
+				"full_time": false
+			},
+			"salary": "3500"
+		}
+	]
+}
