@@ -130,6 +130,15 @@ body {
 				h3 {
 					color: orange;
 				}
+
+				ol {
+					padding-left: 20px;
+					.job {
+						margin: 10px;
+						display: flex;
+						justify-content: space-between;
+					}
+				}
 			}
 		}
 	}

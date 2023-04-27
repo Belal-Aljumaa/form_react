@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.scss';
 import axios from 'axios';
+import { RiDeleteBinLine } from 'react-icons/ri';
 
 const _formData = {
 	jobTitle: '',
@@ -89,6 +90,13 @@ function App() {
 		const response = await axios.post(`${backendUrl}/jobs`, formData);
 		getJobs();
 		setFormData(_formData);
+	};
+
+	const handleDeleteJob = (job: IJob) => {
+		(async () => {
+			const response = await axios.delete(`${backendUrl}/jobs/${job.id}`);
+			getJobs();
+		})();
 	};
 
 	return (
@@ -230,15 +238,35 @@ function App() {
 								</span>{' '}
 								Jobs:
 							</h3>
-							{jobs.map((job) => {
-								return (
-									<ul className="job" key={job.id}>
-										<li className="title">
-											{job.jobTitle}
-										</li>
-									</ul>
-								);
-							})}
+							<ol>
+								{jobs.map((job) => {
+									return (
+										<div className="job">
+											<li className="title" key={job.id}>
+												{job.jobTitle}
+											</li>
+											<div>
+												<span
+													onClick={() =>
+														handleDeleteJob(job)
+													}
+													style={{
+														color: 'red',
+														marginLeft: '20px',
+														fontWeight: 'bold',
+													}}
+												>
+													<RiDeleteBinLine
+														style={{
+															cursor: 'pointer',
+														}}
+													/>
+												</span>
+											</div>
+										</div>
+									);
+								})}
+							</ol>
 						</div>
 					</div>
 				</aside>
