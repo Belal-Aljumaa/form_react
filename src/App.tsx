@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import './App.scss';
 import axios from 'axios';
 import { RiDeleteBinLine } from 'react-icons/ri';
+import { FaEdit } from 'react-icons/fa';
 
 const _formData = {
 	jobTitle: '',
@@ -32,6 +33,7 @@ const backendUrl = 'http://localhost:5557';
 function App() {
 	const [formData, setFormData] = useState(_formData);
 	const [jobs, setJobs] = useState<IJob[]>([]);
+	const [jobIdToEdit, setJobIdToEdit] = useState<number | null>(null);
 
 	const getJobs = async () => {
 		const response = (await axios.get(`${backendUrl}/jobs`)).data;
@@ -39,9 +41,7 @@ function App() {
 	};
 
 	useEffect(() => {
-		(async () => {
-			getJobs();
-		})();
+		getJobs();
 	}, []);
 
 	const handleFieldChange = (e: any, field: string) => {
@@ -87,9 +87,16 @@ function App() {
 			return;
 		}
 
-		const response = await axios.post(`${backendUrl}/jobs`, formData);
-		getJobs();
-		setFormData(_formData);
+		if (jobIdToEdit !== null) {
+			await axios.patch(`${backendUrl}/jobs/${jobIdToEdit}`, formData);
+			setJobIdToEdit(null);
+			getJobs();
+			setFormData(_formData);
+		} else {
+			const response = await axios.post(`${backendUrl}/jobs`, formData);
+			getJobs();
+			setFormData(_formData);
+		}
 	};
 
 	const handleDeleteJob = (job: IJob) => {
@@ -97,6 +104,11 @@ function App() {
 			const response = await axios.delete(`${backendUrl}/jobs/${job.id}`);
 			getJobs();
 		})();
+	};
+
+	const handleEditJob = (job: IJob) => {
+		setFormData(job);
+		setJobIdToEdit(job.id);
 	};
 
 	return (
@@ -241,8 +253,8 @@ function App() {
 							<ol>
 								{jobs.map((job) => {
 									return (
-										<div className="job">
-											<li className="title" key={job.id}>
+										<div className="job" key={job.id}>
+											<li className="title">
 												{job.jobTitle}
 											</li>
 											<div>
@@ -252,11 +264,27 @@ function App() {
 													}
 													style={{
 														color: 'red',
-														marginLeft: '20px',
 														fontWeight: 'bold',
 													}}
 												>
 													<RiDeleteBinLine
+														style={{
+															cursor: 'pointer',
+														}}
+													/>
+												</span>
+
+												<span
+													onClick={() =>
+														handleEditJob(job)
+													}
+													style={{
+														color: 'red',
+														marginLeft: '10px',
+														fontWeight: 'bold',
+													}}
+												>
+													<FaEdit
 														style={{
 															cursor: 'pointer',
 														}}
