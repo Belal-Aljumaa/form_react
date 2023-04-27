@@ -2,3 +2,19 @@
 
 ### GET JOBS
 GET {{url}}/jobs
+
+
+### POST JOB
+POST {{url}}/jobs
+Content-Type: application/json
+
+{
+  "jobTitle": "Frontend Developer",
+	"description": "",
+	"location": "mainz",
+	"details": {
+		"remote": true,
+		"full_time": true
+	},
+	"salary": "4500"
+}

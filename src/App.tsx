@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.scss';
+import axios from 'axios';
 
 const _formData = {
 	jobTitel: '',
@@ -12,8 +13,31 @@ const _formData = {
 	salary: 0,
 };
 
+interface IDetails {
+	remote: boolean;
+	full_time: boolean;
+}
+interface IJob {
+	id: number;
+	jobTitle: string;
+	description: string;
+	location: string;
+	details: IDetails;
+	salary: number;
+}
+
+const backendUrl = 'http://localhost:5557';
+
 function App() {
 	const [formData, setFormData] = useState(_formData);
+	const [jobs, setJobs] = useState<IJob[]>([]);
+
+	useEffect(() => {
+		(async () => {
+			const response = (await axios.get(`${backendUrl}/jobs`)).data;
+			setJobs(response);
+		})();
+	}, []);
 
 	const handleFieldChange = (e: any, field: string) => {
 		const value = e.target.value;
@@ -174,7 +198,26 @@ function App() {
 				</form>
 				<aside className="right">
 					<div className="debuggingArea">
+						<h3>Debugging Panel:</h3>
 						<pre>{JSON.stringify(formData, null, 2)}</pre>
+						<div className="jobs">
+							<h3>
+								There are{' '}
+								<span style={{ color: 'red' }}>
+									{jobs.length}
+								</span>{' '}
+								Jobs:
+							</h3>
+							{jobs.map((job) => {
+								return (
+									<ul className="job" key={job.id}>
+										<li className="title">
+											{job.jobTitle}
+										</li>
+									</ul>
+								);
+							})}
+						</div>
 					</div>
 				</aside>
 			</section>
