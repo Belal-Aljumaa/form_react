@@ -3,7 +3,7 @@ import './App.scss';
 import axios from 'axios';
 
 const _formData = {
-	jobTitel: '',
+	jobTitle: '',
 	description: '',
 	location: '',
 	details: {
@@ -32,10 +32,14 @@ function App() {
 	const [formData, setFormData] = useState(_formData);
 	const [jobs, setJobs] = useState<IJob[]>([]);
 
+	const getJobs = async () => {
+		const response = (await axios.get(`${backendUrl}/jobs`)).data;
+		setJobs(response);
+	};
+
 	useEffect(() => {
 		(async () => {
-			const response = (await axios.get(`${backendUrl}/jobs`)).data;
-			setJobs(response);
+			getJobs();
 		})();
 	}, []);
 
@@ -45,28 +49,46 @@ function App() {
 
 		switch (field) {
 			case 'jobTitle':
-				formData.jobTitel = value;
+				setFormData({ ...formData, jobTitle: value });
 				break;
 			case 'description':
-				formData.description = value;
+				setFormData({ ...formData, description: value });
 				break;
 			case 'location':
-				formData.location = value;
+				setFormData({ ...formData, location: value });
 				break;
 			case 'remote':
-				formData.details.remote = checked;
+				setFormData({
+					...formData,
+					details: { ...formData.details, remote: checked },
+				});
 				break;
 			case 'fullTime':
-				formData.details.full_time = checked;
+				setFormData({
+					...formData,
+					details: { ...formData.details, full_time: checked },
+				});
 				break;
 			case 'salary':
-				formData.salary = value;
+				setFormData({ ...formData, salary: value });
 				break;
 
 			default:
 				break;
 		}
-		setFormData({ ...formData });
+	};
+
+	const handleSaveForm = async (e: any) => {
+		e.preventDefault();
+
+		const { jobTitle, description, location, salary } = formData;
+		if (!jobTitle && !description && !location && salary === 0) {
+			return;
+		}
+
+		const response = await axios.post(`${backendUrl}/jobs`, formData);
+		getJobs();
+		setFormData(_formData);
 	};
 
 	return (
@@ -74,7 +96,7 @@ function App() {
 			<h1>Job Site</h1>
 
 			<section className="main">
-				<form>
+				<form onSubmit={(e) => handleSaveForm(e)}>
 					<fieldset>
 						<legend>New Job</legend>
 						<div className="row">
@@ -82,7 +104,7 @@ function App() {
 							<div>
 								<input
 									type="text"
-									value={formData.jobTitel}
+									value={formData.jobTitle}
 									onChange={(e) =>
 										handleFieldChange(e, 'jobTitle')
 									}
@@ -192,7 +214,7 @@ function App() {
 						</div>
 
 						<div className="buttonRow">
-							<button>Save</button>
+							<button type="submit">Save</button>
 						</div>
 					</fieldset>
 				</form>
